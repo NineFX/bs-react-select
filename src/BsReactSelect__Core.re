@@ -17,24 +17,26 @@ type menuRendererProps('a) = {
 
 module StrOrNode = {
   type t;
-  type arg =
-    | Str(string)
-    | Node(ReasonReact.reactElement);
+  type arg = [
+    | `Str(string)
+    | `Node(ReasonReact.reactElement)
+  ];
   let encode: arg => t =
     fun
-    | Str(v) => Obj.magic(v)
-    | Node(v) => Obj.magic(v);
+    | `Str(v) => Obj.magic(v)
+    | `Node(v) => Obj.magic(v);
   let encodeOpt = Belt.Option.map(_, encode);
 };
 
 module StrOrInt = {
   type t;
-  type arg =
-    | Str(string)
-    | Int(int);
+  type arg = [
+    | `Str(string)
+    | `Int(int)
+  ];
   let encode: arg => t =
     fun
-    | Str(v) => Obj.magic(v)
-    | Int(v) => Obj.magic(v);
+    | `Str(v) => Obj.magic(v)
+    | `Int(v) => Obj.magic(v);
   let encodeOpt = Belt.Option.map(_, encode);
 };

@@ -2,26 +2,28 @@ open BsReactSelect__Core;
 
 module Option = {
   type t('a);
-  type arg('a) =
-    | Str(string)
-    | Arr('a);
+  type arg('a) = [
+    | `Str(string)
+    | `Arr('a)
+    ];
   let encode: arg('a) => t('a) =
     fun
-    | Str(v) => Obj.magic(v)
-    | Arr(v) => Obj.magic(v);
+    | `Str(v) => Obj.magic(v)
+    | `Arr(v) => Obj.magic(v);
   let encodeOpt = Belt.Option.map(_, encode);
 };
 
 module FilterOptions = {
   type t('a);
   type sortFunc('a) = (~options: 'a, ~filter: string, ~current: 'a) => 'a;
-  type arg('a) =
-    | Bool(bool)
-    | Func(sortFunc('a));
+  type arg('a) = [
+    | `Bool(bool)
+    | `Func(sortFunc('a))
+    ];
   let encode: arg('a) => t('a) =
     fun
-    | Bool(v) => Obj.magic(v)
-    | Func(v) => Obj.magic(v);
+    | `Bool(v) => Obj.magic(v)
+    | `Func(v) => Obj.magic(v);
   let encodeOpt = Belt.Option.map(_, encode);
 };
 
@@ -71,7 +73,7 @@ module SelectJS = {
       ~noResultsText: StrOrNode.t=?, /* placeholder displayed when there are no matching search results or a falsy value to hide it */
       ~onBlur: Js.t({..}) => unit=?, /* onBlur handler: function(event) {} */
       ~onBlurResetsInput: bool=?, /* Whether to clear input on blur or not. If set to false, it only works if onCloseResetsInput is also false */
-      ~onChange: Js.nullable('a) => unit=?, /* onChange handler: function(newOption) {} */
+      ~onChange: 'a => unit=?, /* onChange handler: function(newOption) {} */
       ~onClose: unit => unit=?, /* handler for when the menu closes: function () {} */
       ~onCloseResetsInput: bool=?, /* whether to clear input when closing the menu through the arrow */
       ~onFocus: unit => unit=?, /* onFocus handler: function(event) {} */
@@ -80,13 +82,13 @@ module SelectJS = {
       ~onMenuScrollToBottom: unit => unit=?, /* called when the menu is scrolled to the bottom */
       ~onOpen: unit => unit=?, /* handler for when the menu opens: function () {} */
       ~onSelectResetsInput: bool=?, /* whether the input value should be reset when options are selected. */
-      ~onValueClick: ('a, Js.t({..})) => unit=?, /* onClick handler for value labels: function (value, event) {} */
+      ~onValueClick: (array('a), Js.t({..})) => unit=?, /* onClick handler for value labels: function (value, event) {} */
       ~openOnClick: bool=?, /* open the options menu when the control is clicked (requires searchable = true) */
       ~openOnFocus: bool=?, /* open the options menu when the control gets focus */
       ~optionClassName: string=?, /* additional class(es) to apply to the elements */
       ~optionComponent: React.element=?, /* option component to render in dropdown */
       ~optionRenderer: 'a => React.element=?, /* custom function to render the options in the menu */
-      ~options: array('a)=?, /* array of options */
+      ~options: 'a=?, /* array of options */
       ~removeSelected: bool=?, /* whether the selected option is removed from the dropdown on multi selects */
       ~pageSize: int=?, /* number of options to jump when using page up/down keys */
       ~placeholder: StrOrNode.t=?, /* field placeholder, displayed when there's no value */
@@ -108,11 +110,11 @@ module SelectJS = {
       ~valueKey: string=?, /* the option property to use for the value */
       ~valueRenderer: 'a => React.element=?, /* function which returns a custom way to render the value selected function (option) {} */
       ~wrapperStyle: ReactDOMRe.Style.t=?, /* optional styles to apply to the component wrapper */
-      ~children: React.element,
     )
     => React.element = "default";
 };
 
+[@react.component]
 let make =
     (
       ~arrowRenderer=?,
@@ -154,7 +156,6 @@ let make =
       ~noResultsText=?,
       ~onBlur=?,
       ~onBlurResetsInput=?,
-      ~onChange=?,
       ~onClose=?,
       ~onCloseResetsInput=?,
       ~onFocus=?,
@@ -189,91 +190,87 @@ let make =
       ~valueKey=?,
       ~valueRenderer=?,
       ~wrapperStyle=?,
-      children,
+      ~onChange=?,
     ) => {
 
-  let handleChange = vJs =>
-    switch (onChange) {
-    | Some(onChange) => onChange(Js.toOption(vJs))
-    | None => ()
-    };
-
-  <SelectJS
-    multi=true
-    arrowRenderer=?arrowRenderer
-    autoBlur=?autoBlur
-    autofocus=?autofocus
-    autoFocus=?autoFocus
-    autoload=?autoload
-    autosize=?autosize
-    backspaceRemoves=?backspaceRemoves
-    backspaceToRemoveMessage=?backspaceToRemoveMessage
-    className=?className
-    clearable=?clearable
-    clearAllText=?clearAllText
-    clearRenderer=?clearRenderer
-    clearValueText=?clearValueText
-    closeOnSelect=?closeOnSelect
-    deleteRemoves=?deleteRemoves
-    delimiter=?delimiter
-    disabled=?disabled
-    escapeClearsValue=?escapeClearsValue
-    filterOption=?filterOption
-    filterOptions=?(filterOptions |> FilterOptions.encodeOpt)
-    id=?id
-    ignoreAccents=?ignoreAccents
-    ignoreCase=?ignoreCase
-    inputProps=?inputProps
-    inputRenderer=?inputRenderer
-    instanceId=?instanceId
-    isLoading=?isLoading
-    joinValues=?joinValues
-    labelKey=?labelKey
-    matchPos=?matchPos
-    matchProp=?matchProp
-    menuBuffer=?menuBuffer
-    menuContainerStyle=?menuContainerStyle
-    menuRenderer=?menuRenderer
-    menuStyle=?menuStyle
-    name=?name
-    noResultsText=?(noResultsText |> StrOrNode.encodeOpt)
-    onBlur=?onBlur
-    onBlurResetsInput=?onBlurResetsInput
-    onChange=handleChange
-    onClose=?onClose
-    onCloseResetsInput=?onCloseResetsInput
-    onFocus=?onFocus
-    onInputChange=?onInputChange
-    onInputKeyDown=?onInputKeyDown
-    onMenuScrollToBottom=?onMenuScrollToBottom
-    onOpen=?onOpen
-    onSelectResetsInput=?onSelectResetsInput
-    onValueClick=?onValueClick
-    openOnClick=?openOnClick
-    openOnFocus=?openOnFocus
-    optionClassName=?optionClassName
-    optionComponent=?optionComponent
-    optionRenderer=?optionRenderer
-    options=?options
-    removeSelected=?removeSelected
-    pageSize=?pageSize
-    placeholder=?(placeholder |> StrOrNode.encodeOpt)
-    required=?required
-    resetValue=?(resetValue |> Option.encodeOpt)
-    rtl=?rtl
-    scrollMenuIntoView=?scrollMenuIntoView
-    searchable=?searchable
-    searchPromptText=?(searchPromptText |> StrOrNode.encodeOpt)
-    simpleValue=?simpleValue
-    style=?style
-    tabIndex=?(tabIndex |> StrOrInt.encodeOpt)
-    tabSelectsValue=?tabSelectsValue
-    trimFilter=?trimFilter
-    value=?(value |> Option.encodeOpt)
-    valueComponent=?valueComponent
-    valueKey=?valueKey
-    valueRenderer=?valueRenderer
-    wrapperStyle=?wrapperStyle
-  >(children)</SelectJS>
+  [@JSX]
+  SelectJS.createElement(
+    ~multi=true,
+    ~arrowRenderer=?arrowRenderer,
+    ~autoBlur=?autoBlur,
+    ~autofocus=?autofocus,
+    ~autoFocus=?autoFocus,
+    ~autoload=?autoload,
+    ~autosize=?autosize,
+    ~backspaceRemoves=?backspaceRemoves,
+    ~backspaceToRemoveMessage=?backspaceToRemoveMessage,
+    ~className=?className,
+    ~clearable=?clearable,
+    ~clearAllText=?clearAllText,
+    ~clearRenderer=?clearRenderer,
+    ~clearValueText=?clearValueText,
+    ~closeOnSelect=?closeOnSelect,
+    ~deleteRemoves=?deleteRemoves,
+    ~delimiter=?delimiter,
+    ~disabled=?disabled,
+    ~escapeClearsValue=?escapeClearsValue,
+    ~filterOption=?filterOption,
+    ~filterOptions=?(filterOptions |> FilterOptions.encodeOpt),
+    ~id=?id,
+    ~ignoreAccents=?ignoreAccents,
+    ~ignoreCase=?ignoreCase,
+    ~inputProps=?inputProps,
+    ~inputRenderer=?inputRenderer,
+    ~instanceId=?instanceId,
+    ~isLoading=?isLoading,
+    ~joinValues=?joinValues,
+    ~labelKey=?labelKey,
+    ~matchPos=?matchPos,
+    ~matchProp=?matchProp,
+    ~menuBuffer=?menuBuffer,
+    ~menuContainerStyle=?menuContainerStyle,
+    ~menuRenderer=?menuRenderer,
+    ~menuStyle=?menuStyle,
+    ~name=?name,
+    ~noResultsText=?(noResultsText |> StrOrNode.encodeOpt),
+    ~onBlur=?onBlur,
+    ~onBlurResetsInput=?onBlurResetsInput,
+    ~onClose=?onClose,
+    ~onCloseResetsInput=?onCloseResetsInput,
+    ~onFocus=?onFocus,
+    ~onInputChange=?onInputChange,
+    ~onInputKeyDown=?onInputKeyDown,
+    ~onMenuScrollToBottom=?onMenuScrollToBottom,
+    ~onOpen=?onOpen,
+    ~onSelectResetsInput=?onSelectResetsInput,
+    ~onValueClick=?onValueClick,
+    ~openOnClick=?openOnClick,
+    ~openOnFocus=?openOnFocus,
+    ~optionClassName=?optionClassName,
+    ~optionComponent=?optionComponent,
+    ~optionRenderer=?optionRenderer,
+    ~options=?options,
+    ~removeSelected=?removeSelected,
+    ~pageSize=?pageSize,
+    ~placeholder=?(placeholder |> StrOrNode.encodeOpt),
+    ~required=?required,
+    ~resetValue=?(resetValue |> Option.encodeOpt),
+    ~rtl=?rtl,
+    ~scrollMenuIntoView=?scrollMenuIntoView,
+    ~searchable=?searchable,
+    ~searchPromptText=?(searchPromptText |> StrOrNode.encodeOpt),
+    ~simpleValue=?simpleValue,
+    ~style=?style,
+    ~tabIndex=?(tabIndex |> StrOrInt.encodeOpt),
+    ~tabSelectsValue=?tabSelectsValue,
+    ~trimFilter=?trimFilter,
+    ~value=?(value |> Option.encodeOpt),
+    ~valueComponent=?valueComponent,
+    ~valueKey=?valueKey,
+    ~valueRenderer=?valueRenderer,
+    ~wrapperStyle=?wrapperStyle,
+    ~onChange=?onChange,
+    ()
+  );
 
 };

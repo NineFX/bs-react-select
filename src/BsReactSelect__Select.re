@@ -2,26 +2,28 @@ open BsReactSelect__Core;
 
 module Option = {
   type t('a);
-  type arg('a) =
-    | Str(string)
-    | Val('a);
+  type arg('a) = [
+    | `Str(string)
+    | `Val('a)
+    ];
   let encode: arg('a) => t('a) =
     fun
-    | Str(v) => Obj.magic(v)
-    | Val(v) => Obj.magic(v);
+    | `Str(v) => Obj.magic(v)
+    | `Val(v) => Obj.magic(v);
   let encodeOpt = Belt.Option.map(_, encode);
 };
 
 module FilterOptions = {
   type t('a);
   type sortFunc('a) = (~options: array('a), ~filter: string) => array('a);
-  type arg('a) =
-    | Bool(bool)
-    | Func(sortFunc('a));
+  type arg('a) = [
+    | `Bool(bool)
+    | `Func(sortFunc('a))
+  ];
   let encode: arg('a) => t('a) =
     fun
-    | Bool(v) => Obj.magic(v)
-    | Func(v) => Obj.magic(v);
+    | `Bool(v) => Obj.magic(v)
+    | `Func(v) => Obj.magic(v);
   let encodeOpt = Belt.Option.map(_, encode);
 };
 
@@ -108,11 +110,11 @@ module SelectJS = {
       ~valueKey: string=?, /* the option property to use for the value */
       ~valueRenderer: 'a => React.element=?, /* function which returns a custom way to render the value selected function (option) {} */
       ~wrapperStyle: ReactDOMRe.Style.t=?, /* optional styles to apply to the component wrapper */
-      ~children: React.element,
     )
     => React.element = "default";
 };
 
+[@react.component]
 let make =
     (
       ~arrowRenderer=?,
@@ -154,7 +156,6 @@ let make =
       ~noResultsText=?,
       ~onBlur=?,
       ~onBlurResetsInput=?,
-      ~onChange=?,
       ~onClose=?,
       ~onCloseResetsInput=?,
       ~onFocus=?,
@@ -189,7 +190,7 @@ let make =
       ~valueKey=?,
       ~valueRenderer=?,
       ~wrapperStyle=?,
-      children,
+      ~onChange=?,
     ) => {
 
   let handleChange = vJs =>
@@ -198,82 +199,84 @@ let make =
     | None => ()
     };
 
-  <SelectJS
-    multi=false
-    arrowRenderer=?arrowRenderer
-    autoBlur=?autoBlur
-    autofocus=?autofocus
-    autoFocus=?autoFocus
-    autoload=?autoload
-    autosize=?autosize
-    backspaceRemoves=?backspaceRemoves
-    backspaceToRemoveMessage=?backspaceToRemoveMessage
-    className=?className
-    clearable=?clearable
-    clearAllText=?clearAllText
-    clearRenderer=?clearRenderer
-    clearValueText=?clearValueText
-    closeOnSelect=?closeOnSelect
-    deleteRemoves=?deleteRemoves
-    delimiter=?delimiter
-    disabled=?disabled
-    escapeClearsValue=?escapeClearsValue
-    filterOption=?filterOption
-    filterOptions=?(filterOptions |> FilterOptions.encodeOpt)
-    id=?id
-    ignoreAccents=?ignoreAccents
-    ignoreCase=?ignoreCase
-    inputProps=?inputProps
-    inputRenderer=?inputRenderer
-    instanceId=?instanceId
-    isLoading=?isLoading
-    joinValues=?joinValues
-    labelKey=?labelKey
-    matchPos=?matchPos
-    matchProp=?matchProp
-    menuBuffer=?menuBuffer
-    menuContainerStyle=?menuContainerStyle
-    menuRenderer=?menuRenderer
-    menuStyle=?menuStyle
-    name=?name
-    noResultsText=?(noResultsText |> StrOrNode.encodeOpt)
-    onBlur=?onBlur
-    onBlurResetsInput=?onBlurResetsInput
-    onChange=handleChange
-    onClose=?onClose
-    onCloseResetsInput=?onCloseResetsInput
-    onFocus=?onFocus
-    onInputChange=?onInputChange
-    onInputKeyDown=?onInputKeyDown
-    onMenuScrollToBottom=?onMenuScrollToBottom
-    onOpen=?onOpen
-    onSelectResetsInput=?onSelectResetsInput
-    onValueClick=?onValueClick
-    openOnClick=?openOnClick
-    openOnFocus=?openOnFocus
-    optionClassName=?optionClassName
-    optionComponent=?optionComponent
-    optionRenderer=?optionRenderer
-    options=?options
-    removeSelected=?removeSelected
-    pageSize=?pageSize
-    placeholder=?(placeholder |> StrOrNode.encodeOpt)
-    required=?required
-    resetValue=?(resetValue |> Option.encodeOpt)
-    rtl=?rtl
-    scrollMenuIntoView=?scrollMenuIntoView
-    searchable=?searchable
-    searchPromptText=?(searchPromptText |> StrOrNode.encodeOpt)
-    simpleValue=?simpleValue
-    style=?style
-    tabIndex=?(tabIndex |> StrOrInt.encodeOpt)
-    tabSelectsValue=?tabSelectsValue
-    trimFilter=?trimFilter
-    value=?(value |> Option.encodeOpt)
-    valueComponent=?valueComponent
-    valueKey=?valueKey
-    valueRenderer=?valueRenderer
-    wrapperStyle=?wrapperStyle
-  >(children)</SelectJS>
+  [@JSX]
+  SelectJS.createElement(
+    ~multi=false,
+    ~arrowRenderer=?arrowRenderer,
+    ~autoBlur=?autoBlur,
+    ~autofocus=?autofocus,
+    ~autoFocus=?autoFocus,
+    ~autoload=?autoload,
+    ~autosize=?autosize,
+    ~backspaceRemoves=?backspaceRemoves,
+    ~backspaceToRemoveMessage=?backspaceToRemoveMessage,
+    ~className=?className,
+    ~clearable=?clearable,
+    ~clearAllText=?clearAllText,
+    ~clearRenderer=?clearRenderer,
+    ~clearValueText=?clearValueText,
+    ~closeOnSelect=?closeOnSelect,
+    ~deleteRemoves=?deleteRemoves,
+    ~delimiter=?delimiter,
+    ~disabled=?disabled,
+    ~escapeClearsValue=?escapeClearsValue,
+    ~filterOption=?filterOption,
+    ~filterOptions=?(filterOptions |> FilterOptions.encodeOpt),
+    ~id=?id,
+    ~ignoreAccents=?ignoreAccents,
+    ~ignoreCase=?ignoreCase,
+    ~inputProps=?inputProps,
+    ~inputRenderer=?inputRenderer,
+    ~instanceId=?instanceId,
+    ~isLoading=?isLoading,
+    ~joinValues=?joinValues,
+    ~labelKey=?labelKey,
+    ~matchPos=?matchPos,
+    ~matchProp=?matchProp,
+    ~menuBuffer=?menuBuffer,
+    ~menuContainerStyle=?menuContainerStyle,
+    ~menuRenderer=?menuRenderer,
+    ~menuStyle=?menuStyle,
+    ~name=?name,
+    ~noResultsText=?(noResultsText |> StrOrNode.encodeOpt),
+    ~onBlur=?onBlur,
+    ~onBlurResetsInput=?onBlurResetsInput,
+    ~onClose=?onClose,
+    ~onCloseResetsInput=?onCloseResetsInput,
+    ~onFocus=?onFocus,
+    ~onInputChange=?onInputChange,
+    ~onInputKeyDown=?onInputKeyDown,
+    ~onMenuScrollToBottom=?onMenuScrollToBottom,
+    ~onOpen=?onOpen,
+    ~onSelectResetsInput=?onSelectResetsInput,
+    ~onValueClick=?onValueClick,
+    ~openOnClick=?openOnClick,
+    ~openOnFocus=?openOnFocus,
+    ~optionClassName=?optionClassName,
+    ~optionComponent=?optionComponent,
+    ~optionRenderer=?optionRenderer,
+    ~options=?options,
+    ~removeSelected=?removeSelected,
+    ~pageSize=?pageSize,
+    ~placeholder=?(placeholder |> StrOrNode.encodeOpt),
+    ~required=?required,
+    ~resetValue=?(resetValue |> Option.encodeOpt),
+    ~rtl=?rtl,
+    ~scrollMenuIntoView=?scrollMenuIntoView,
+    ~searchable=?searchable,
+    ~searchPromptText=?(searchPromptText |> StrOrNode.encodeOpt),
+    ~simpleValue=?simpleValue,
+    ~style=?style,
+    ~tabIndex=?(tabIndex |> StrOrInt.encodeOpt),
+    ~tabSelectsValue=?tabSelectsValue,
+    ~trimFilter=?trimFilter,
+    ~value=?(value |> Option.encodeOpt),
+    ~valueComponent=?valueComponent,
+    ~valueKey=?valueKey,
+    ~valueRenderer=?valueRenderer,
+    ~wrapperStyle=?wrapperStyle,
+    ~onChange=handleChange,
+    ()
+  );
 
 };
