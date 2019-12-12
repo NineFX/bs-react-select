@@ -28,12 +28,15 @@
     "bs:watch": "bsb -make-world -clean-world -w",
     "bs:setup": "bsb -make-world"
   },
+  "peerDependencies": {
+    "react-dom": "^16.8.0"
+  },
   "dependencies": {
-    "react": "^16.2.0",
-    "react-select": "1.2.1"
+    "react": "^16.12.0",
+    "react-select": "^3.0.8"
   },
   "devDependencies": {
-    "bs-platform": "^4.0.18",
-    "reason-react": "^0.5.3"
+    "bs-platform": "^6.2.1",
+    "reason-react": "^0.7.0"
   }
 }
