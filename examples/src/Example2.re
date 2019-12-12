@@ -11,19 +11,28 @@ type action =
 
 type state = {selectedItem: array(item)};
 
-let component = ReasonReact.reducerComponent("App");
+[@react.component]
+let make = (~options) => {
 
-let make = (~options, _children) => {
-  ...component,
-  initialState: () => {selectedItem: [|{"value": "one", "label": "One"}|]},
-  reducer: (action, _state) =>
+  let initialState = {selectedItem: [|{"value": "two", "label": "Two"}, {"value": "two", "label": "Two"}|]};
+
+  let reducer = (_state, action) =>
     switch (action) {
-    | Change(item) => ReasonReact.Update({selectedItem: item})
-    },
-  render: self =>
-    <SelectMulti
-      options
-      value={SelectMulti.Option.Arr(self.state.selectedItem)}
-      onChange={selected => self.send(Change(selected))}
-    />,
+      | Change(selectedItem) => {
+        Js.log2("SELECTED ITEMS: ", selectedItem);
+        {selectedItem: selectedItem};
+      }
+      };
+
+  let (state, send) = React.useReducer(reducer, initialState);
+
+  <SelectMulti
+    options
+    value={`Arr(state.selectedItem)}
+    onChange={selected => {
+      Js.log2("SELECTED ARR: ", selected);
+      send(Change(selected));
+    }}
+  />;
+
 };

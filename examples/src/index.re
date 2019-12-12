@@ -1,4 +1,4 @@
-[%bs.raw {|require('react-select/dist/react-select.css')|}];
+[%bs.raw {|require('./react-select.css')|}];
 
 let options = [|
   {"value": "one", "label": "One"},
@@ -19,6 +19,5 @@ ReactDOMRe.renderToElementWithId(
     <Example1 options />
     <h2> {ReasonReact.string("Multi-select component")} </h2>
     <Example2 options />
-  </div>,
-  "root",
-);
+  </div>
+  , "root");
